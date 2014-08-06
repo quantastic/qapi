@@ -1,4 +1,4 @@
-# quantastic-api
+# quantastic api
 
 ## Time Entry Rules
 
