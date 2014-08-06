@@ -88,7 +88,7 @@ Response:
   "time": {
     "id": "d8a83fd8da3fda45523546f71a4c592e",
     "category": ["Work", "Acme", "Project X"],
-    "end": null,
+    "end": "2014-08-06T16:39:00Z",
     "start": "2014-08-06T15:23:00Z",
     "note": "Buy razor to shave the yak."
   }
