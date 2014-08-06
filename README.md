@@ -1,5 +1,18 @@
 # quantastic-api
 
+## Time Entry Rules
+
+* There can only be one active time entry, indicated by `{end: null}`. This
+  entry's duration is assumed to range from its `start` value up to the current
+  time.
+* Creating a new active time entry sets the `end` value of the previously
+  active entry to the `start` value of the new entry.
+* If an entry overlaps with one or more entries, the active entry or the entry
+  with the higher `end` value shadows the older entries. This means their `end`
+  value may be adjusted, or they may be removed from a result set entirely.
+  However, the original times remain stored internally and an API for showing
+  all shadowing will be exposed in the future.
+
 ## API
 
 ### List Time Entries
