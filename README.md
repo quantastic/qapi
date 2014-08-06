@@ -37,7 +37,8 @@ Request:
 
 ```
 POST /times
-
+```
+```json
 {
   "category": ["Work", "Acme", "Project X"],
   "end": null,
