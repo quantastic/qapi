@@ -30,14 +30,22 @@ Response:
   "times": [
     {
       "id": "9a810cced51b1b29dda47acb1b7af319",
-      "category": ["Work", "Acme", "Project X"],
+      "category": {
+        "name": ["Work", "Acme", "Project X"],
+        "url": "http://localhost:8080/times/categories/Work/Acme/Project X"
+      },
       "end": null,
       "start": "2014-08-06T15:23:00Z",
       "note": "Buy razor to shave the yak."
+      "url": "http://localhost:8080/times/9a810cced51b1b29dda47acb1b7af319",
     },
     {
       "id": "d8a83fd8da3fda45523546f71a4c592e",
-      "category": ["Sleep"],
+      "url": "http://localhost:8080/times/d8a83fd8da3fda45523546f71a4c592e",
+      "category": {
+        "name": ["Sleep"],
+        "url": "http://localhost:8080/times/categories/Sleep"
+      },
       "end": "2014-08-06T15:23:00Z",
       "start": "2014-08-06T07:39:00Z",
       "note": "zzZZzz"
@@ -107,3 +115,23 @@ Response:
   }
 }
 ```
+
+### List Categories
+
+Request:
+
+```
+GET /times/categories
+```
+
+Response:
+
+```json
+{
+  "categories": [
+    {
+      "name": ["Work", "Acme", "Project X"],
+      "url": "http://localhost:8080/times/categories/Work/Acme/Project X"
+    },
+  ],
+}
