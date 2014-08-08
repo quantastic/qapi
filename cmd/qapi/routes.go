@@ -23,5 +23,5 @@ func CreateTime(w http.ResponseWriter, r *http.Request) {
 	if err := jsonDecode(w, r, t); err != nil {
 		return
 	}
-	jsonWrite(w, http.StatusOK, map[string]interface{}{"time": t})
+	jsonWrite(w, http.StatusCreated, map[string]interface{}{"time": t})
 }
