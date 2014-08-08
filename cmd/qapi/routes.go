@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -21,6 +22,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func CreateTime(w http.ResponseWriter, r *http.Request) {
 	t := &qapi.Time{}
 	if err := jsonDecode(w, r, t); err != nil {
+		return
+	}
+	if t.Start.IsZero() {
+		err := fmt.Errorf("Missing start value.")
+		badRequest(w, err)
 		return
 	}
 	jsonWrite(w, http.StatusCreated, map[string]interface{}{"time": t})
