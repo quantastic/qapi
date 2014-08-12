@@ -51,7 +51,7 @@ func mapTime(r *http.Request, t *qapi.Time) error {
 func NewTime(t qapi.Time) Time {
 	return Time{
 		Id:       t.Id,
-		URL:      fmt.Sprintf("%s/times/%s", config.Url, t.Id),
+		URL:      fmt.Sprintf("%s/times/%s", config.URL, t.Id),
 		Category: NewTimeCategory(t.Category),
 		End:      t.End,
 		Start:    t.Start,
@@ -75,7 +75,7 @@ type Time struct {
 func NewTimeCategory(category []string) TimeCategory {
 	return TimeCategory{
 		Name: category,
-		URL:  fmt.Sprintf("%s/times/c/%s", config.Url, strings.Join(category, "/")),
+		URL:  fmt.Sprintf("%s/times/categories/%s", config.URL, strings.Join(category, "/")),
 	}
 }
 
