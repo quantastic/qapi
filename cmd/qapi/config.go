@@ -9,6 +9,8 @@ import (
 
 type Config struct {
 	Addr string
+	Dir  string
+	Url  string
 }
 
 func ParseFlags(args []string, c *Config) (string, error) {
@@ -17,6 +19,9 @@ func ParseFlags(args []string, c *Config) (string, error) {
 	f.SetOutput(msg)
 	f.Usage = func() {}
 	f.StringVar(&c.Addr, "addr", ":8080", "Http host:port to listen on.")
+	f.StringVar(&c.Dir, "dir", "qdata", "Path to dir to store data in.")
+	// @TODO Adjust url according to addr if default is used
+	f.StringVar(&c.Url, "url", "http://localhost:8080", "Base url to use for links.")
 	fmt.Fprintf(msg, "qapi")
 	f.PrintDefaults()
 	fmt.Fprintf(msg, "\n")

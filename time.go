@@ -4,27 +4,25 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 )
 
-// @TODO Implement only accepting /outputting UTC JSON.
-type UTCTime struct {
-	time.Time
-}
-
-func NewTime() *Time {
-	return &Time{Id: newId(), Start: time.Now()}
+func NewTime() Time {
+	return Time{Start: time.Now()}
 }
 
 type Time struct {
-	Id       string     `json:"id"`
-	Category *Category  `json:"category"`
-	End      *time.Time `json:"end"`
-	Start    time.Time  `json:"start"`
-	Note     string     `json:"note"`
+	Id       string
+	Category []string
+	End      *time.Time
+	Start    time.Time
+	Note     string
+	Created  time.Time
+	Updated  time.Time
 }
 
-func (t *Time) Duration() time.Duration {
+func (t Time) Duration() time.Duration {
 	var end time.Time
 	if t.End != nil {
 		end = *t.End
@@ -34,8 +32,22 @@ func (t *Time) Duration() time.Duration {
 	return end.Sub(t.Start)
 }
 
-type Category struct {
-	Name []string `json:"note"`
+func (t Time) Valid() error {
+	if t.Start.IsZero() {
+		return fmt.Errorf("Start must not be zero")
+	}
+	if t.End != nil && t.End.Before(t.Start) {
+		return fmt.Errorf("End must not be before Start.")
+	}
+	if len(t.Category) < 1 {
+		return fmt.Errorf("Category must not be empty.")
+	}
+	for _, part := range t.Category {
+		if strings.TrimSpace(part) == "" {
+			return fmt.Errorf("Category part must not be empty.")
+		}
+	}
+	return nil
 }
 
 func newId() string {

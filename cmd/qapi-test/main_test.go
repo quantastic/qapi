@@ -29,13 +29,19 @@ func ParseFlags(args []string, c *Config) {
 	flag.Parse()
 }
 
-// init() builds and launcheis a qapi process to run test against. Initially I
+// init() builds and launches a qapi process to run test against. Initially I
 // wanted qapi-test to be a regular binary with a main(), but then I realized
 // I'd have to come up with my own *testing.T style functionality and decided
 // to be lazy for now and just piggy back on *testing.T. Maybe I'll revist this
 // in the future.
 func init() {
 	ParseFlags(os.Args[1:], &config)
+	fmt.Printf("-> Running unit tests\n")
+	test := exec.Command("go", "test", "github.com/quantastic/qapi")
+	testOut, err := test.CombinedOutput()
+	if err != nil {
+		fatalf("Unit tests failed: %s:\n%s", err, testOut)
+	}
 	fmt.Printf("-> Building qapi\n")
 	tmpDir, err := ioutil.TempDir("", "qapi-test")
 	if err != nil {
