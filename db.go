@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/bradfitz/slice"
 )
 
 const timeFile = "time.json"
@@ -57,6 +59,18 @@ func (d *Db) saveTimes() error {
 	return os.Rename(file.Name(), filepath.Join(d.dir, timeFile))
 }
 
+func (d *Db) Times() ([]Time, error) {
+	times := make([]Time, 0, len(d.times))
+	for _, t := range d.times {
+		t.normalize()
+		times = append(times, t)
+	}
+	slice.Sort(times, func(i, j int) bool {
+		return times[i].Start.After(times[j].Start)
+	})
+	return times, nil
+}
+
 func (d *Db) SaveTime(t *Time) error {
 	now := time.Now().UTC().Truncate(time.Second)
 	if t.Id == "" {
@@ -64,11 +78,7 @@ func (d *Db) SaveTime(t *Time) error {
 		t.Created = now
 	}
 	t.Updated = now
-	t.Start = t.Start.UTC().Truncate(time.Second)
-	if t.End != nil {
-		ue := t.End.UTC().Truncate(time.Second)
-		t.End = &ue
-	}
+	t.normalize()
 	d.times[t.Id] = *t
 	return d.saveTimes()
 }

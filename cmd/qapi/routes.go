@@ -13,12 +13,32 @@ import (
 func Router() http.Handler {
 	mux := mux.NewRouter()
 	mux.Methods("GET").Path("/").HandlerFunc(Home)
+	mux.Methods("GET").Path("/times").HandlerFunc(ListTimes)
 	mux.Methods("POST").Path("/times").HandlerFunc(CreateTime)
 	return mux
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	jsonWrite(w, http.StatusOK, map[string]interface{}{})
+	res := struct {
+		TimesURL string `json:"times_url"`
+	}{
+		TimesURL: fmt.Sprintf("%s/times", config.URL),
+	}
+	jsonWrite(w, http.StatusOK, res)
+}
+
+func ListTimes(w http.ResponseWriter, r *http.Request) {
+	times, err := db.Times()
+	if err != nil {
+		jsonWrite(w, http.StatusInternalServerError, err)
+		return
+	}
+	results := make([]Time, 0, len(times))
+	for _, t := range times {
+		results = append(results, NewTime(t))
+	}
+	res := map[string]interface{}{"times": results}
+	jsonWrite(w, http.StatusOK, res)
 }
 
 func CreateTime(w http.ResponseWriter, r *http.Request) {

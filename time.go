@@ -50,6 +50,14 @@ func (t Time) Valid() error {
 	return nil
 }
 
+func (t *Time) normalize() {
+	t.Start = t.Start.UTC().Truncate(time.Second)
+	if t.End != nil {
+		ue := t.End.UTC().Truncate(time.Second)
+		t.End = &ue
+	}
+}
+
 func newId() string {
 	b := make([]byte, 16)
 	if _, err := io.ReadAtLeast(rand.Reader, b, len(b)); err != nil {
