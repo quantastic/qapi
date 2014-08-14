@@ -19,16 +19,19 @@ func OpenDb(dir string) (*Db, error) {
 	if err := os.MkdirAll(dir, 0777); err != nil {
 		return nil, err
 	}
-	db := &Db{dir: dir, times: make(map[string]Time)}
+	db := &Db{dir: dir, times: make(map[string]*Time)}
 	if err := db.loadTimes(); err != nil {
 		return nil, err
 	}
 	return db, nil
 }
 
+// Db is a simple/naive file based data storage. It will eventually be replaced
+// with adapters for real databases, but for now this is convenient to
+// prototype with.
 type Db struct {
 	dir   string
-	times map[string]Time
+	times map[string]*Time
 }
 
 func (d *Db) loadTimes() error {
@@ -63,15 +66,38 @@ func (d *Db) Times() ([]Time, error) {
 	times := make([]Time, 0, len(d.times))
 	for _, t := range d.times {
 		t.normalize()
-		times = append(times, t)
+		times = append(times, t.Copy())
 	}
 	slice.Sort(times, func(i, j int) bool {
-		return times[i].Start.After(times[j].Start)
+		if times[i].End == nil {
+			return true
+		} else if times[j].End == nil {
+			return false
+		}
+		return times[i].End.After(*times[j].End)
 	})
 	return times, nil
 }
 
+func (d *Db) active() *Time {
+	var active *Time
+	for _, t := range d.times {
+		if t.End == nil {
+			// @TODO Return the latest active entry and make sure other methods
+			// only return a single active entry if this kind of data corruption
+			// is present. Then also provide a method to list the corrupted entries.
+			if active != nil {
+				panic("More than one active entry")
+			}
+			active = t
+		}
+	}
+	return active
+}
+
 func (d *Db) SaveTime(t *Time) error {
+	c := t.Copy()
+	t = &c
 	now := time.Now().UTC().Truncate(time.Second)
 	if t.Id == "" {
 		t.Id = mustUUID()
@@ -79,7 +105,20 @@ func (d *Db) SaveTime(t *Time) error {
 	}
 	t.Updated = now
 	t.normalize()
-	d.times[t.Id] = *t
+	if t.End == nil {
+		active := d.active()
+		if active != nil {
+			var s time.Time
+			if t.Start.Before(active.Start) {
+				s = active.Start
+			} else {
+				s = t.Start
+			}
+			active.End = &s
+			active.Updated = now
+		}
+	}
+	d.times[t.Id] = t
 	return d.saveTimes()
 }
 

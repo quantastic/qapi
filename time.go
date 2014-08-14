@@ -50,6 +50,17 @@ func (t Time) Valid() error {
 	return nil
 }
 
+func (t Time) Copy() Time {
+	category := t.Category
+	t.Category = make([]string, len(t.Category))
+	copy(t.Category, category)
+	if t.End != nil {
+		end := *t.End
+		t.End = &end
+	}
+	return t
+}
+
 func (t *Time) normalize() {
 	t.Start = t.Start.UTC().Truncate(time.Second)
 	if t.End != nil {
