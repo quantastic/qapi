@@ -62,6 +62,7 @@ func CreateTime(w http.ResponseWriter, r *http.Request) {
 func mapTime(r *http.Request, t *qapi.Time) error {
 	m := NewMap()
 	m.Required("category", &t.Category)
+	// @TODO Make start optional, default to current time.
 	m.Required("start", &t.Start)
 	m.Optional("end", &t.End)
 	m.Optional("note", &t.Note)
