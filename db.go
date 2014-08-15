@@ -68,14 +68,7 @@ func (d *Db) Times() ([]Time, error) {
 		t.normalize()
 		times = append(times, t.Copy())
 	}
-	slice.Sort(times, func(i, j int) bool {
-		if times[i].End == nil {
-			return true
-		} else if times[j].End == nil {
-			return false
-		}
-		return times[i].End.After(*times[j].End)
-	})
+	Sort(times)
 	return times, nil
 }
 
@@ -120,6 +113,45 @@ func (d *Db) SaveTime(t *Time) error {
 	}
 	d.times[t.Id] = t
 	return d.saveTimes()
+}
+
+// @TODO Write test
+func Sort(times []Time) {
+	slice.Sort(times, func(i, j int) bool {
+		if times[i].End == nil {
+			// i is active entry, sort it before j
+			return true
+		} else if times[j].End == nil {
+			// j is active entry, sort it before i
+			return false
+		}
+		if times[i].End.Equal(*times[j].End) {
+			// i and j have same end, sort i before j if i started after j
+			return times[i].Start.After(times[j].Start)
+		}
+		// sort i before j if it ends after j
+		return times[i].End.After(*times[j].End)
+	})
+}
+
+func Shadow(times []Time) []Time {
+	results := make([]Time, 0, len(times))
+	var prev *Time
+	for _, t := range times {
+		c := t.Copy()
+		if prev != nil {
+			if c.End.After(prev.Start) {
+				e := prev.Start
+				if e.Before(c.Start) {
+					e = c.Start
+				}
+				c.End = &e
+			}
+		}
+		results = append(results, c)
+		prev = &c
+	}
+	return results
 }
 
 func mustUUID() string {
