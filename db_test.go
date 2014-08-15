@@ -114,7 +114,7 @@ func Test_Db_SaveTime(t *testing.T) {
 	}
 }
 
-func TestShadow(t *testing.T) {
+func TestShadowTimes(t *testing.T) {
 	offset, err := time.Parse(time.RFC3339, "2014-08-13T09:00:00Z")
 	if err != nil {
 		t.Fatal(err)
@@ -179,7 +179,7 @@ func TestShadow(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		results := Shadow(test.Input)
+		results := ShadowTimes(test.Input)
 		if len(results) != len(test.Want) {
 			t.Errorf("test %d: want %d results, got %d", i, len(test.Want), len(results))
 			continue

@@ -68,7 +68,7 @@ func (d *Db) Times() ([]Time, error) {
 		t.normalize()
 		times = append(times, t.Copy())
 	}
-	Sort(times)
+	SortTimes(times)
 	return times, nil
 }
 
@@ -116,7 +116,7 @@ func (d *Db) SaveTime(t *Time) error {
 }
 
 // @TODO Write test
-func Sort(times []Time) {
+func SortTimes(times []Time) {
 	slice.Sort(times, func(i, j int) bool {
 		if times[i].End == nil {
 			// i is active entry, sort it before j
@@ -134,7 +134,7 @@ func Sort(times []Time) {
 	})
 }
 
-func Shadow(times []Time) []Time {
+func ShadowTimes(times []Time) []Time {
 	results := make([]Time, 0, len(times))
 	var prev *Time
 	for _, t := range times {
